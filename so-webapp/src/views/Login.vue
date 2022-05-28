@@ -1,7 +1,7 @@
 <template>
  <div class="login">
     <h2 class="title"><a><img :src="require('@/assets/logo.png')" style="border:1px white solid; margin-left: auto; width: 45px; height: 45px;"></a> SocialOut</h2>
-    <form action class="form">
+    <form action class="form" @submit.prevent="login">
       <label class="form-label" for="#email">Email:</label>
       <input v-model="email" class="form-input" type="email" id="email" required placeholder="Email">
       <label class="form-label" for="#password">Password:</label>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'ReportedUsers',
   data: () => ({
@@ -21,9 +22,26 @@ export default {
     error: false
   }),
   methods: {
-    login() {
-      console.log(this.email);
-      console.log(this.password);
+    async login() {
+      axios({
+        url: "https://socialout-develop.herokuapp.com/v1/admin/login",
+        method: "post",
+        data: JSON.stringify({
+          "email": this.email,
+          "password": this.password
+        }),
+        headers: {
+          'content-type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        axios.defaults.headers.common['Authorizaton'] = 'Bearer ' + response.data.access_token
+        this.$router.push('/')
+      })
+      .catch(() => {
+        this.error = true
+      })
     }
   }
 }

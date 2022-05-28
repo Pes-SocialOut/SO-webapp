@@ -28,7 +28,7 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 export default {
   name: 'BannedUsers',
   data () {
@@ -39,7 +39,18 @@ export default {
   },
   methods: {
     getUsers () {
-
+      axios
+        .get('https://jsonplaceholder.typicode.com/users', {
+          headers: {
+            'Authorization': 'Bearer ' + this.token,
+          }
+        })
+        .then(response => {
+          this.usuarios = response.data;
+        })
+        .catch(error => {
+          this.error = error
+        })
     },
     unban () {
 
