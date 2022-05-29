@@ -1,47 +1,42 @@
 <template>
-  <div>
-    <div v-if="users.length > 0">
-      <div v-for="user in users" :key="user.id" class="container">
-        <p>{{ user.user_username }} - {{ user.user_email }}</p>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Events</th>
-              <th>Number of reports</th>
-            </tr>
-          </thead>
-          <tbody v-for="reported_event in user.reported_events" :key="reported_event.id">
-              <td>
-                <router-link :to="{ path: '/eventReviews/' + reported_event.event_id }">{{reported_event.event_name}}</router-link>
-              </td>
-              <td v-if="reported_event.event_num_reports > 2" style="background-color:rgba(255, 0, 0, 0.2);">{{reported_event.num_reports}}</td>
-              <td v-else>{{reported_event.event_num_reports}}</td>
-              <td></td>
-              <button v-on:click="ban(user.user_id)" class="button">Ban</button>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div v-else class="container">No users reported</div>
-    <p>{{error}}</p>
+  <div class="container">
+    <p>
+      {{event.name}} - {{username}} ( {{email}} )
+      <button v-on:click="ban(event.user_creator)" class="button">Ban</button>
+    </p>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Punctuation</th>
+          <th>Review</th>
+        </tr>
+      </thead>
+      <tbody v-for="review in reviews" :key="review.user_id">
+        <td>{{ review.rating }}</td>
+        <td>{{ review.comment }}</td>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-  name: 'ReportedUsers',
+  name: 'EventReviews',
   data () {
     return {
-      users: [],
+      event: {},
+      username: '',
+      email: '',
+      reviews: [],
       error: ''
     }
   },
   methods: {
-    async getUsers() {
+    async getReviews() {
       const self = this;
       axios({
-        url: "v1/admin/reported",
+        url: "/v3/events/review?eventid=" + this.$route.params.id,
         method: "get",
         headers: {
           'Content-type': 'application/json',
@@ -50,7 +45,10 @@ export default {
         withCredentials: true
       })
       .then(response => {
-        self.users = response.data;
+        self.event = response.data.event;
+        self.username = response.data.username;
+        self.email = response.data.email;
+        self.reviews = response.data.reviews;
       })
       .catch(error => {
         if (error.response) {
@@ -76,7 +74,7 @@ export default {
         withCredentials: true
       })
       .then(() => {
-        self.users = self.users.filter(u => {u.id != id});
+        location.reload()
       })
       .catch(error => {
         if (error.response) {
@@ -89,7 +87,7 @@ export default {
     }
   },
   mounted () {
-    this.getUsers();
+    this.getReviews();
   }
 }
 </script>

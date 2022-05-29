@@ -14,7 +14,7 @@
           <tr v-for="user in users" :key="user.id">
             <td>{{user.username}}</td>
             <td>{{user.email}}</td>
-            <td>{{user.bandate}}</td>
+            <td>{{user.date}}</td>
             <button v-on:click="unban(user.email)" class="button">Unban</button>
           </tr>
         </tbody>
@@ -57,13 +57,13 @@ export default {
         }
       })
     },
-    async unban(id) {
+    async unban(email) {
       const self = this;
       axios({
         url: "v1/admin/unban",
         method: "post",
         data: JSON.stringify({
-          "id": id,
+          "email": email,
         }),
         headers: {
           'Content-type': 'application/json',
@@ -72,7 +72,7 @@ export default {
         withCredentials: true
       })
       .then(() => {
-        location.reload()
+        self.users = self.users.filter(u => {u.email != email});
       })
       .catch(error => {
         if (error.response) {

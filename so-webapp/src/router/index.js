@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 import ReportedUsers from '@/views/ReportedUsers.vue'
-import EventReviews from '@/views/Evento.vue'
+import EventReviews from '@/views/EventReviews.vue'
 import Login from '@/views/Login.vue'
 import BannedUsers from '@/views/BannedUsers.vue'
 
@@ -11,7 +11,7 @@ const routes = [
         component: ReportedUsers
     },
     {
-        path: '/eventReviews', //+ id
+        path: '/eventReviews/:id',
         name: 'EventReviews',
         component: EventReviews
     },
