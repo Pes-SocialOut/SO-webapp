@@ -1,63 +1,89 @@
 <template>
-  <div class="bar">
-    <div class="container">
-      <a><img :src="require('@/assets/logo.png')" style="border:1px white solid; margin-left: auto;"></a>
-      <router-link :to="{path: '/'}" class="title">SocialOut</router-link>
-      <a class="subtitle">Reported users</a>
-    </div>
-  </div>
   <div>
-    <div v-for="user in users" :key="user.id" class="container">
-      <p>{{ user.username }}</p>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Events</th>
-            <th>Number of reports</th>
-          </tr>
-        </thead>
-        <tbody>
-          <td>{{user.name}}</td>
-          <td v-if=true style="background-color:rgba(255, 0, 0, 0.2);">{{user.email}}</td>
-          <td v-else>{{user.email}}</td>
-          <td></td>
-          <button v-on:click="ban" class="button">Ban</button>
-        </tbody>
-      </table>
+    <div v-if="users.length > 0">
+      <div v-for="user in users" :key="user.id" class="container">
+        <p>{{ user.user_username }} - {{ user.user_email }}</p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Events</th>
+              <th>Number of reports</th>
+            </tr>
+          </thead>
+          <tbody v-for="reported_event in user.reported_events" :key="reported_event.id">
+              <td>{{reported_event.event_name}}</td>
+              <td v-if="reported_event.event_num_reports > 2" style="background-color:rgba(255, 0, 0, 0.2);">{{reported_event.num_reports}}</td>
+              <td v-else>{{reported_event.event_num_reports}}</td>
+              <td></td>
+              <button v-on:click="ban(user.user_id)" class="button">Ban</button>
+          </tbody>
+        </table>
+      </div>
     </div>
+    <div v-else class="container">No users reported</div>
+    <p>{{error}}</p>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 export default {
-  name: 'BannedUsers',
+  name: 'ReportedUsers',
   data () {
     return {
-      error: '',
-      users: []
+      users: [],
+      error: ''
     }
   },
   methods: {
-    getUsers () {
-      axios
-        .get('https://jsonplaceholder.typicode.com/users', {
-          headers: {
-            'Authorization': 'Bearer ' + this.token,
-          }
-        })
-        .then(response => {
-          this.users = response.data;
-          if (response.statusCode == 400) {
-            this.$router.push("/login");
-          }
-        })
-        .catch(error => {
-          this.error = error
-        })
+    async getUsers() {
+      const self = this;
+      axios({
+        url: "v1/admin/reported",
+        method: "get",
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
+      })
+      .then(response => {
+        self.users = response.data;
+      })
+      .catch(error => {
+        if (error.response) {
+          if  (error.response.status === 401)
+            self.$router.push('/login');
+          else 
+            self.error = error.response.data.error_message;
+        }
+      })
     },
-    unban () {
-      
+    async ban(id) {
+      const self = this;
+      axios({
+        url: "v1/admin/ban",
+        method: "post",
+        data: JSON.stringify({
+          "id": id,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
+      })
+      .then(() => {
+        location.reload()
+      })
+      .catch(error => {
+        if (error.response) {
+          if  (error.response.status === 401)
+            self.$router.push('/login');
+          else 
+            self.error = error.response.data.error_message;
+        }
+      })
     }
   },
   mounted () {

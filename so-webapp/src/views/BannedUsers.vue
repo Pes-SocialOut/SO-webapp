@@ -1,29 +1,25 @@
 <template>
-  <div class="bar">
-    <div class="container">
-      <a><img :src="require('@/assets/logo.png')" style="border:1px white solid; margin-left: auto;"></a>
-      <router-link :to="{path: '/'}" class="title">SocialOut</router-link>
-      <a class="subtitle">Banned users</a>
-    </div>
-  </div>
   <div class="container">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Ban date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="usuario in usuarios" :key="usuario.id">
-          <td>{{usuario.name}}</td>
-          <td>{{usuario.email}}</td>
-          <td>{{usuario.website}}</td>
-          <button v-on:click="unban" class="button">Unban</button>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="users.length < 1">No users banned</div>
+    <div v-else>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Ban date</th>
+          </tr>
+        </thead>  
+        <tbody>
+          <tr v-for="user in users" :key="user.id">
+            <td>{{user.username}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.bandate}}</td>
+            <button v-on:click="unban(user.email)" class="button">Unban</button>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -34,26 +30,58 @@ export default {
   data () {
     return {
       error: '',
-      usuarios: []
+      users: []
     }
   },
   methods: {
-    getUsers () {
-      axios
-        .get('https://jsonplaceholder.typicode.com/users', {
-          headers: {
-            'Authorization': 'Bearer ' + this.token,
-          }
-        })
-        .then(response => {
-          this.usuarios = response.data;
-        })
-        .catch(error => {
-          this.error = error
-        })
+    async getUsers() {
+      const self = this;
+      axios({
+        url: "v1/admin/banned",
+        method: "get",
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
+      })
+      .then(response => {
+        self.users = response.data;
+      })
+      .catch(error => {
+        if (error.response) {
+          if  (error.response.status === 401)
+            self.$router.push('/login');
+          else 
+            self.error = error.response.data.error_message;
+        }
+      })
     },
-    unban () {
-
+    async unban(id) {
+      const self = this;
+      axios({
+        url: "v1/admin/unban",
+        method: "post",
+        data: JSON.stringify({
+          "id": id,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
+      })
+      .then(() => {
+        location.reload()
+      })
+      .catch(error => {
+        if (error.response) {
+          if  (error.response.status === 401)
+            self.$router.push('/login');
+          else 
+            self.error = error.response.data.error_message;
+        }
+      })
     }
   },
   mounted () {
@@ -63,32 +91,14 @@ export default {
 </script>
 
 <style scoped>
-.bar {
-  background-color: #38A3A5;
-}
-.title {
-  color: white;
-  font-weight: bold;
-  font-size: 20px;
-  text-decoration: none;
-  margin-left: 10px;
-}
-.subtitle {
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  margin-left: 200px;
-}
-.container img {
-  width: 2%;
-  height: 2%;
-  margin-top: 9px;
-}
 .button {
   background-color: rgba(56, 163, 165, 0.4);
   border: none;
   display: inline-block;
   margin-top: 17px;
   border-radius: 4px;
+}
+.container {
+  background-color: rgba(56, 163, 165, 0.2);
 }
 </style>

@@ -24,19 +24,19 @@ export default {
   methods: {
     async login() {
       axios({
-        url: "https://socialout-develop.herokuapp.com/v1/admin/login",
+        url: "v1/admin/login",
         method: "post",
         data: JSON.stringify({
           "email": this.email,
           "password": this.password
         }),
         headers: {
-          'content-type': 'application/json',
+          'Content-type': 'application/json',
           'Accept': 'application/json'
         }
       })
       .then(response => {
-        axios.defaults.headers.common['Authorizaton'] = 'Bearer ' + response.data.access_token
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
         this.$router.push('/')
       })
       .catch(() => {
