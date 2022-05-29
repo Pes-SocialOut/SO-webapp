@@ -41,7 +41,7 @@ export default {
     async getUsers() {
       const self = this;
       axios({
-        url: "v1/admin/reported",
+        url: "https://socialout-develop.herokuapp.com/v1/admin/reported",
         method: "get",
         headers: {
           'Content-type': 'application/json',
@@ -64,7 +64,7 @@ export default {
     async ban(id) {
       const self = this;
       axios({
-        url: "v1/admin/ban",
+        url: "https://socialout-develop.herokuapp.com/v1/admin/ban",
         method: "post",
         data: JSON.stringify({
           "id": id,

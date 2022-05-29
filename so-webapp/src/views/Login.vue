@@ -24,7 +24,7 @@ export default {
   methods: {
     async login() {
       axios({
-        url: "v1/admin/login",
+        url: "https://socialout-develop.herokuapp.com/v1/admin/login",
         method: "post",
         data: JSON.stringify({
           "email": this.email,
