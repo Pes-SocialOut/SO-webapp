@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="users.length < 1">No users banned</div>
+    <div v-if="users.length < 1" class="advice">No users banned</div>
     <div v-else>
       <table class="table table-striped">
         <thead>
@@ -100,5 +100,10 @@ export default {
 }
 .container {
   background-color: rgba(56, 163, 165, 0.2);
+}
+.advice{
+  margin-top: 30px;
+  font-size: 20px;
+  text-align: center;
 }
 </style>

@@ -1,29 +1,37 @@
 <template>
   <div>
     <div v-if="users.length > 0">
-      <div v-for="user in users" :key="user.id" class="container">
-        <p>{{ user.user_username }} - {{ user.user_email }}</p>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Events</th>
-              <th>Number of reports</th>
-            </tr>
-          </thead>
-          <tbody v-for="reported_event in user.reported_events" :key="reported_event.id">
-              <td>
-                <router-link :to="{ path: '/eventReviews/' + reported_event.event_id }">{{reported_event.event_name}}</router-link>
-              </td>
-              <td v-if="reported_event.event_num_reports > 2" style="background-color:rgba(255, 0, 0, 0.2);">{{reported_event.num_reports}}</td>
-              <td v-else>{{reported_event.event_num_reports}}</td>
-              <td></td>
-              <button v-on:click="ban(user.user_id)" class="button">Ban</button>
-          </tbody>
-        </table>
+      <div v-for="user in users" :key="user.id">
+        <div class="container">
+          <div>
+            <td class="info">User: </td>
+            <td>{{user.user_username}}</td>
+          </div>
+          <div>
+            <td class="info">Email: </td>
+            <td>{{user.user_email}}</td>
+          </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Events</th>
+                <th>Number of reports</th>
+              </tr>
+            </thead>
+            <tbody v-for="reported_event in user.reported_events" :key="reported_event.id">
+                <td>
+                  <router-link :to="{ path: '/eventReviews/' + reported_event.event_id }">{{reported_event.event_name}}</router-link>
+                </td>
+                <td v-if="reported_event.event_num_reports > 2" style="background-color:rgba(255, 0, 0, 0.2);">{{reported_event.event_num_reports}}</td>
+                <td v-else>{{reported_event.event_num_reports}}</td>
+                <td></td>
+                <button v-if="reported_event.event_id === user.reported_events[0].event_id" v-on:click="ban(user.user_id)" class="button">Ban</button>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-    <div v-else class="container">No users reported</div>
-    <p>{{error}}</p>
+    <div v-else class="advice">No users reported</div>
   </div>
 </template>
 
@@ -97,6 +105,7 @@ export default {
 <style scoped>
 .container {
   background-color: rgba(56, 163, 165, 0.2);
+  margin-bottom: 10px;
 }
 .button {
   border: 2px solid rgb(56, 163, 165);;
@@ -104,7 +113,14 @@ export default {
   margin-top: 17px;
   border-radius: 4px;
 }
-p{
-  text-decoration-line: underline;
+.info{
+  font-weight: bold;
+  padding: 0;
+}
+.advice{
+  margin-top: 30px;
+  font-size: 20px;
+  text-align: center;
+  background-color: rgba(56, 163, 165, 0.2);
 }
 </style>
