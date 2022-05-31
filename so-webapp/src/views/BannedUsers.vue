@@ -37,7 +37,7 @@ export default {
     async getUsers() {
       const self = this;
       axios({
-        url: "https://socialout-develop.herokuapp.com/v1/admin/banned",
+        url: "https://socialout-production.herokuapp.com/v1/admin/banned",
         method: "get",
         headers: {
           'Content-type': 'application/json',
@@ -60,7 +60,7 @@ export default {
     async unban(email) {
       const self = this;
       axios({
-        url: "https://socialout-develop.herokuapp.com/v1/admin/unban",
+        url: "https://socialout-production.herokuapp.com/v1/admin/unban",
         method: "post",
         data: JSON.stringify({
           "email": email,

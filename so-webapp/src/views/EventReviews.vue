@@ -36,7 +36,7 @@ export default {
     async getReviews() {
       const self = this;
       axios({
-        url: "https://socialout-develop.herokuapp.com/v3/events/review?eventid=" + this.$route.params.id,
+        url: "https://socialout-production.herokuapp.com/v3/events/review?eventid=" + this.$route.params.id,
         method: "get",
         headers: {
           'Content-type': 'application/json',
@@ -62,7 +62,7 @@ export default {
     async ban(id) {
       const self = this;
       axios({
-        url: "https://socialout-develop.herokuapp.com/v1/admin/ban",
+        url: "https://socialout-production.herokuapp.com/v1/admin/ban",
         method: "post",
         data: JSON.stringify({
           "id": id,
